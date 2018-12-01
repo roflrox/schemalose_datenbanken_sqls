@@ -46,11 +46,18 @@ CREATE TABLE IF NOT EXISTS Mitglieder_TMP(
 
 );
 \copy Mitglieder_TMP FROM './data/Mitglieder.csv' DELIMITER ',' CSV HEADER;
+
 UPDATE Mitglieder_TMP SET GebDatum = concat('0',GebDatum) WHERE length(GebDatum)<8;
+
 INSERT INTO Mitglieder (ID_Mit,Name,Rolle,GebDatum,Geschlecht)
 SELECT ID_Mit,Name,Rolle,to_date(GebDatum,'ddmmyyyy'),Geschlecht from Mitglieder_TMP;
+
 DROP TABLE IF EXISTS MITGLIEDER_TMP;
 \copy Beitraege FROM './data/Beitraege.csv' DELIMITER ',' CSV HEADER;
+
 \copy Kommentare_tmp(ID_Bei,ID_Mit,Nr,Kommentar) FROM  './data/Kommentare.csv' DELIMITER ',' CSV HEADER;
-INSERT INTO Kommentare(ID_Mit,ID_Bei,Kommentar) SELECT ID_Mit,ID_Bei,Kommentar from Kommentare_tmp where ID_Mit IS NOT NULL and ID_Bei IS NOT NULL;
+
+INSERT INTO Kommentare(ID_Mit,ID_Bei,Kommentar) SELECT ID_Mit,ID_Bei,Kommentar from Kommentare_tmp
+where ID_Mit IS NOT NULL and ID_Bei IS NOT NULL;
+
 DROP TABLE IF EXISTS Kommentare_tmp;
